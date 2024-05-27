@@ -117,8 +117,7 @@ def place_order():
     #     subject="welcoming",
     #     html_content='<strong>hello is this working5555 inshalla</strong>'
     # )
-    # sg = SendGridAPIClient(
-    #     "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")
+    
     # try:
     #     res = sg.send(msg)
     #     print(res.status_code)
