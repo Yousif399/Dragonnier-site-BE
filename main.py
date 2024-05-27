@@ -111,20 +111,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 def place_order():
     # order = process_order(request.form)
 
-    # msg = Mail(
-    #     from_email='yousifm2099@gmail.com',
-    #     to_emails='zenb19@yahoo.com',
-    #     subject="welcoming",
-    #     html_content='<strong>hello is this working5555 inshalla</strong>'
-    # )
-    
-    # try:
-    #     res = sg.send(msg)
-    #     print(res.status_code)
-    #     print(res.body)
-    #     print(res.headers)
-    # except Exception as e:
-    #     print(e.message)
+ 
     msg = Message('Confirmation', sender='help@dragonnier.com', recipients=['joseph.ahmed65@yahoo.com','yousifm2099@gmail.com'])
     msg.html = '<strong class="style" >helllo world from css</strong>'
     mail.send(msg)
