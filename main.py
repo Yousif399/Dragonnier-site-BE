@@ -99,7 +99,7 @@ def send_notification(order, recipient):
     msg = Message('Order Confirmation',
                   sender='joseph.ahmed65@yahoo.com', recipients=[recipient])
     # msg.html = render_template('index.html')
-    msg.body = "HELLLLLOPOOOO"
+    msg.body = "HELLLLLOPOOOOooo"
 
     mail.send(msg)
 
