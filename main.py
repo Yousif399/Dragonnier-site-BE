@@ -171,15 +171,15 @@ def place_order():
     <body>
         <div class="container">
         <div class="input-wrapper"> 
-         <img src="http://127.0.0.1:5000/image" alt="Logo" width="60">
+         <img src="https://dragonnier-site.netlify.app/images/DragonnierLogo.png" alt="Logo" width="60">
             <h2>Thank You for Your Order, {data['name']}!</h2>
         </div>
             <div class="order-details">
                 <h3>Order Details:</h3>
                 <div><strong>Product:</strong> {data['product']}</div>
                 <div><strong>Quantity:</strong> {data['quantity']}</div>
-                <div><strong>Subtotal:</strong> ${data['subtotal']}</div>
-                <div><strong>Taxes:</strong> ${data['taxes']}</div>
+                <div><strong>Subtotal:</strong> {data['subtotal']}</div>
+                <div><strong>Taxes:</strong> {data['taxes']}</div>
                 <div class="total"><strong>Total:</strong> ${data['total']}</div>
             </div>
             <div class="shipping-info">
