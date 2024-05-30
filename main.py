@@ -166,6 +166,10 @@ def place_order():
                 font-size: 0.9em;
                 color: #777;
             }}
+
+            .email {{
+                text-decoration: underline;
+            }}
         </style>
     </head>
     <body>
@@ -191,7 +195,7 @@ def place_order():
                 <div><strong>Phone Number:</strong> {data['phone']}</div>
                 <div><strong>Company:</strong> {data['company']}</div>
             </div>
-            <h3>Your order is now being processed. If you have any questions or need to make changes to your order, please feel free to contact us at help@dragonnier.com.</h3>
+            <h3>Your order is now being processed. If you have any questions or need to make changes to your order, please feel free to contact us at <a class="email" href="mailto:help@dragonnier.com">help@dragonnier.com.</a> </h3>
         </div>
     </body>
     </html>
