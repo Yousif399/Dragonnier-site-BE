@@ -22,4 +22,4 @@ app.config['MAIL_PASSWORD'] = os.environ.get('SENDGRID_API_KEY')
 
 
 db = SQLAlchemy(app)
-# something 
+# somethin
