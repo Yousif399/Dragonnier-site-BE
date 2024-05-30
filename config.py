@@ -16,7 +16,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'
 app.config['MAIL_PORT'] = 587  # Use SSL
 app.config['MAIL_USERNAME'] = 'apikey'
-app.config['MAIL_PASSWORD'] = os.getenv('SENDGRID_API_KEY')
+app.config['MAIL_PASSWORD'] = os.environ.get('SENDGRID_API_KEY')
 
 
 
