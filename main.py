@@ -105,10 +105,13 @@ def send_notification(order, recipient):
 
 
 ssl._create_default_https_context = ssl._create_unverified_context
+
+
 @app.route('/image')
 def serve_image():
     image_path = 'images/DragonnierLogo.png'
     return send_file(image_path, mimetype='image/jpeg')
+
 
 @app.route('/place-order', methods=['POST'])
 def place_order():
@@ -210,7 +213,5 @@ def place_order():
 
 if __name__ == "__main__":
     with app.app_context():
-        if not os.path.exists(os.path.join(basedir, "mydatabase.db")):
-            db.create_all()
-
-    app.run(debug=True)
+        db.create_all()
+        app.run(debug=True)
