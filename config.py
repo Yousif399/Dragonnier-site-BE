@@ -10,7 +10,7 @@ app = Flask(__name__)
 CORS(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://ynflnukt:kAx_OzHt3ooj3YgFHqbnPCW3NLA1yziT@ruby.db.elephantsql.com/ynflnukt'
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('SQLALCHEMY_DATABASE_URI')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'

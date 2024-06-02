@@ -87,38 +87,34 @@ def delete_product(id):
 mail = Mail(app)
 
 
-def send_confirmation(recipient):
-    msg = Message('Order Confirmation',
-                  sender='joseph.ahmed65@yahoo.com', recipients=[recipient])
-    # msg.html = render_template('index.html')
-    msg.body = "HELLLLLOPOOOO"
+def send_confirmation(email_content,recipient):
+    msg = Message(subject='Order Confirmation', sender='help@dragonnier.com',
+                  recipients=[f"{recipient}"])
+    msg.html = email_content
     mail.send(msg)
 
 
-def send_notification(order, recipient):
-    msg = Message('Order Confirmation',
-                  sender='joseph.ahmed65@yahoo.com', recipients=[recipient])
-    # msg.html = render_template('index.html')
-    msg.body = "HELLLLLOPOOOOooo"
-
+def send_notification(email_content, recipient):
+    msg = Message(subject='Order Confirmation', sender='help@dragonnier.com',
+                  recipients=[f"{'help@dragonnier.com'}"])
+    msg.html = email_content
     mail.send(msg)
 
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
 
-@app.route('/image')
-def serve_image():
-    image_path = 'images/DragonnierLogo.png'
-    return send_file(image_path, mimetype='image/jpeg')
+# @app.route('/image')
+# def serve_image():
+#     image_path = 'images/DragonnierLogo.png'
+#     return send_file(image_path, mimetype='image/jpeg')
 
 
 @app.route('/place-order', methods=['POST'])
 def place_order():
     # order = process_order(request.form)
     data = request.json
-    image = serve_image()
-    print(image)
+    
 
     email_content = f"""
     <!DOCTYPE html>
@@ -203,10 +199,10 @@ def place_order():
     </body>
     </html>
     """
-    msg = Message(subject='Order Confirmation', sender='help@dragonnier.com',
-                  recipients=[f"{data['email']}"])
-    msg.html = email_content
-    mail.send(msg)
+    recipient = data['email']
+
+    send_confirmation(email_content,recipient)
+    send_notification(email_content,recipient)
 
     return 'yaessss worked'
 
