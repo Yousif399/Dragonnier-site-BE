@@ -1,11 +1,11 @@
 from flask import request, json, jsonify, render_template, send_file
-from config import app, db, basedir
+from config import app, db
 from models import Product
 from flask_mail import Mail, Message
 import os
-# from sendgrid import SendGridAPIClient
-# from sendgrid.helpers.mail import Mail
 import ssl
+from werkzeug.utils import secure_filename
+import uuid
 
 # CRUD
 
@@ -23,31 +23,55 @@ def get_product():
 
 # Create product
 
+def make_unique_filename(filename):
+    new_filename = str(uuid.uuid4()) + '_' + filename
+    print(new_filename)
+    return new_filename
+
 
 @app.route('/create-product', methods=['POST'])
 def create_products():
-    product_name = request.json.get("productName")
-    product_price = request.json.get("productPrice")
-    product_img = request.json.get("productImg")
-    product_quantity = request.json.get("productQuantity")
 
-    if not product_name or not product_price or not product_img or not product_quantity:
-        return (jsonify({"Message": "Make sure you entered your correct info"}), 400)
-
-    new_product = Product(product_name=product_name,
-                          product_price=product_price,
-                          product_img=product_img,
-                          product_quantity=product_quantity)
     try:
-        db.session.add(new_product)
-        db.session.commit()
-    except Exception as ex:
-        return jsonify({"Message": str(ex)}), 400
+        product_name = request.form["productName"]
+        product_price = request.form["productPrice"]
+        product_quantity = request.form["productQuantity"]
+        product_img = request.form.get("productImg", None)
+        product_file = request.files.get("productFile", None)
 
-    return jsonify({"Message": "User created"}), 201
+        print("Product Name:", product_name)
+        print("Product Price:", product_price)
+        print("Product Quantity:", product_quantity)
+        print("Product Img URL:", product_img)
+        print("Product Img File:", product_file)
+
+        if product_file:
+            filename = secure_filename(product_file.filename)
+            destination_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            if os.path.exists(destination_path):
+                filename = make_unique_filename(filename)
+                destination_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            product_file.save(destination_path)
+            product_img = filename
+
+        new_product = Product(product_name=product_name,
+                              product_price=product_price,
+                              product_img=product_img,
+                              product_quantity=product_quantity)
+        try:
+            db.session.add(new_product)
+            db.session.commit()
+            return jsonify({"Message": "Product created"}), 201
+        except Exception as ex:
+            return jsonify({"Message": str(ex)}), 400
+    except Exception as e:
+        print(e)
+        return jsonify({"error": str(e)}), 400
 
 
 # Update product
+
+
 @app.route("/update-product/<int:id>", methods=["PATCH"])
 def update_product(id):
     product = Product.query.get(id)
@@ -87,7 +111,7 @@ def delete_product(id):
 mail = Mail(app)
 
 
-def send_confirmation(email_content,recipient):
+def send_confirmation(email_content, recipient):
     msg = Message(subject='Order Confirmation', sender='help@dragonnier.com',
                   recipients=[f"{recipient}"])
     msg.html = email_content
@@ -114,7 +138,6 @@ ssl._create_default_https_context = ssl._create_unverified_context
 def place_order():
     # order = process_order(request.form)
     data = request.json
-    
 
     email_content = f"""
     <!DOCTYPE html>
@@ -173,7 +196,7 @@ def place_order():
     </head>
     <body>
         <div class="container">
-        <div class="input-wrapper"> 
+        <div class="input-wrapper">
          <img src="https://dragonnier-site.netlify.app/images/DragonnierLogo.png" alt="Logo" width="60">
             <h2>Thank You for Your Order, {data['name']}!</h2>
         </div>
@@ -201,8 +224,8 @@ def place_order():
     """
     recipient = data['email']
 
-    send_confirmation(email_content,recipient)
-    send_notification(email_content,recipient)
+    send_confirmation(email_content, recipient)
+    # send_notification(email_content,recipient)
 
     return 'yaessss worked'
 
