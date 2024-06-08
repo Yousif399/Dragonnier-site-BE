@@ -48,6 +48,8 @@ def create_products():
 
         if product_file:
             filename = secure_filename(product_file.filename)
+            if not os.path.exists(app.config['UPLOAD_FOLDER']):
+                os.makedirs(app.config['UPLOAD_FOLDER'])
             destination_path = os.path.join(
                 app.config['UPLOAD_FOLDER'], filename)
             if os.path.exists(destination_path):
