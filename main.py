@@ -1,4 +1,4 @@
-from flask import request, json, jsonify, render_template, send_file
+from flask import request, json, jsonify, render_template, send_file, send_from_directory
 from config import app, db
 from models import Product
 from flask_mail import Mail, Message
@@ -7,11 +7,11 @@ import ssl
 from werkzeug.utils import secure_filename
 import uuid
 
+
+# app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')  # Ensure correct path
+
 # CRUD
-
 # Get Products
-
-
 @app.route('/product', methods=['GET'])
 def get_product():
     products = Product.query.all()
@@ -21,8 +21,9 @@ def get_product():
         "products": product_list
     })
 
-# Create product
 
+
+# Create product
 def make_unique_filename(filename):
     new_filename = str(uuid.uuid4()) + '_' + filename
     print(new_filename)
@@ -47,10 +48,13 @@ def create_products():
 
         if product_file:
             filename = secure_filename(product_file.filename)
-            destination_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            destination_path = os.path.join(
+                app.config['UPLOAD_FOLDER'], filename)
             if os.path.exists(destination_path):
                 filename = make_unique_filename(filename)
-                destination_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                destination_path = os.path.join(
+                    app.config['UPLOAD_FOLDER'], filename)
+
             product_file.save(destination_path)
             product_img = filename
 
@@ -69,9 +73,15 @@ def create_products():
         return jsonify({"error": str(e)}), 400
 
 
+
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    print('kkk',filename)
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
 # Update product
-
-
 @app.route("/update-product/<int:id>", methods=["PATCH"])
 def update_product(id):
     product = Product.query.get(id)
@@ -91,9 +101,8 @@ def update_product(id):
 
     return jsonify({"Message": "Product updated"}), 200
 
+
 # Delete product
-
-
 @app.route("/delete-product/<int:id>", methods=["DELETE"])
 def delete_product(id):
     product = Product.query.get(id)
@@ -101,13 +110,28 @@ def delete_product(id):
     if not product:
         print('No product found')
         return jsonify({"Message": "Product was not founded to delete"}), 404
+    
+    img_path = os.path.join(app.config['UPLOAD_FOLDER'], product.product_img)
+    try:
+        db.session.delete(product)
+        db.session.commit()
 
-    db.session.delete(product)
-    db.session.commit()
+        #deleteing the img  from file 
+        if os.path.exists(img_path):
+            os.remove(img_path)
+            print(f"Deleted image file: {img_path}")
+        else:
+            print(f"img file not founded: {img_path}")
+        
+        return jsonify({"Message": "Product was deleted successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"Message": f"sn error occured: {str(e)}"}),500
 
-    return jsonify({"Message": "Product was deleted successfully"}), 200
 
 
+
+#send email functions 
 mail = Mail(app)
 
 
