@@ -6,6 +6,7 @@ import os
 import ssl
 from werkzeug.utils import secure_filename
 import uuid
+import cloudinary.uploader
 
 
 
@@ -47,17 +48,11 @@ def create_products():
 
         if product_file:
             filename = secure_filename(product_file.filename)
-            if not os.path.exists(app.config['UPLOAD_FOLDER']):
-                os.makedirs(app.config['UPLOAD_FOLDER'])
-            destination_path = os.path.join(
-                app.config['UPLOAD_FOLDER'], filename)
-            if os.path.exists(destination_path):
-                filename = make_unique_filename(filename)
-                destination_path = os.path.join(
-                    app.config['UPLOAD_FOLDER'], filename)
+            unique_filename = make_unique_filename(filename)
 
-            product_file.save(destination_path)
-            product_img = filename
+            upload_result = cloudinary.uploader.upload(product_file, public_id=unique_filename )
+            print('result uploader: ', upload_result)
+            product_img = upload_result['secure_url']
 
         new_product = Product(product_name=product_name,
                               product_price=product_price,
