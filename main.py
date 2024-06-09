@@ -8,7 +8,6 @@ from werkzeug.utils import secure_filename
 import uuid
 
 
-# app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')  # Ensure correct path
 
 # CRUD
 # Get Products
