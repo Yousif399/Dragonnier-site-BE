@@ -18,7 +18,7 @@ app.config['MAIL_PORT'] = 587  # Use SSL
 app.config['MAIL_USERNAME'] = 'apikey'
 app.config['MAIL_PASSWORD'] = os.environ.get('SENDGRID_API_KEY')
 
-app.config['UPLOAD_FOLDER'] = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'uploads')
+app.config['UPLOAD_FOLDER'] = os.path.join(os.path.abspath(os.path.dirname(__file__)), os.environ.get('SQLALCHEMY_DATABASE_URI'))
 
 
 
