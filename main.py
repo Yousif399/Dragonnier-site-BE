@@ -7,11 +7,12 @@ import ssl
 from werkzeug.utils import secure_filename
 import uuid
 import cloudinary.uploader
-
-
+import requests
 
 # CRUD
 # Get Products
+
+
 @app.route('/product', methods=['GET'])
 def get_product():
     products = Product.query.all()
@@ -20,7 +21,6 @@ def get_product():
         "status": "Ok",
         "products": product_list
     })
-
 
 
 # Create product
@@ -50,7 +50,8 @@ def create_products():
             filename = secure_filename(product_file.filename)
             unique_filename = make_unique_filename(filename)
 
-            upload_result = cloudinary.uploader.upload(product_file, public_id=unique_filename )
+            upload_result = cloudinary.uploader.upload(
+                product_file, public_id=unique_filename)
             print('result uploader: ', upload_result)
             product_img = upload_result['secure_url']
 
@@ -69,11 +70,9 @@ def create_products():
         return jsonify({"error": str(e)}), 400
 
 
-
-
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
-    print('kkk',filename)
+    print('kkk', filename)
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
@@ -106,28 +105,26 @@ def delete_product(id):
     if not product:
         print('No product found')
         return jsonify({"Message": "Product was not founded to delete"}), 404
-    
+
     img_path = os.path.join(app.config['UPLOAD_FOLDER'], product.product_img)
     try:
         db.session.delete(product)
         db.session.commit()
 
-        #deleteing the img  from file 
+        # deleteing the img  from file
         if os.path.exists(img_path):
             os.remove(img_path)
             print(f"Deleted image file: {img_path}")
         else:
             print(f"img file not founded: {img_path}")
-        
+
         return jsonify({"Message": "Product was deleted successfully"}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({"Message": f"sn error occured: {str(e)}"}),500
+        return jsonify({"Message": f"sn error occured: {str(e)}"}), 500
 
 
-
-
-#send email functions 
+# send email functions
 mail = Mail(app)
 
 
@@ -140,7 +137,7 @@ def send_confirmation(email_content, recipient):
 
 def send_notification(email_content, recipient):
     msg = Message(subject='Order Confirmation', sender='help@dragonnier.com',
-                  recipients=[f"{'help@dragonnier.com'}"])
+                  recipients=[f"{'yousifm2099@gmail.com'}"])
     msg.html = email_content
     mail.send(msg)
 
@@ -148,17 +145,35 @@ def send_notification(email_content, recipient):
 ssl._create_default_https_context = ssl._create_unverified_context
 
 
-# @app.route('/image')
-# def serve_image():
-#     image_path = 'images/DragonnierLogo.png'
-#     return send_file(image_path, mimetype='image/jpeg')
+def validate_email(email):
+    # url = f"https://api.hunter.io/v2/email-verifier?email={email}&api_key={os.environ.get('ZeroBounce_API_KEY')}"
+    url = f"https://api.hunter.io/v2/email-verifier?email={email}&api_key={os.environ.get('ZeroBounce_API_KEY')}"
+
+    try:
+        response = requests.get(url)
+        data = response.json()
+        if data and 'data' in data and 'status' in data['data']:
+            print('status of the email: ',data['data']['status'])
+            if data['data']['status'] == 'invalid' or data['data']['status'] == 'disposable':
+                return False
+        else:
+            print('No data founded ')
+            return False
+        
+        return True
+    
+    except Exception as e:
+        print('Error occurred ',e)
+        return False
+
+    
 
 
 @app.route('/place-order', methods=['POST'])
 def place_order():
     # order = process_order(request.form)
     data = request.json
-
+    recipient = data['email']
     email_content = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -226,7 +241,7 @@ def place_order():
                 <div><strong>Quantity:</strong> {data['quantity']}</div>
                 <div><strong>Subtotal:</strong> {data['subtotal']}</div>
                 <div><strong>Taxes:</strong> {data['taxes']}</div>
-                <div class="total"><strong>Total:</strong> ${data['total']}</div>
+                <div class="total"><strong>Total:</strong> {data['total']}</div>
             </div>
             <div class="shipping-info">
                 <h3>Shipping Information:</h3>
@@ -242,12 +257,101 @@ def place_order():
     </body>
     </html>
     """
-    recipient = data['email']
+    email_content2 = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+            }}
+            .container {{
+                width: 100%;
+                max-width: 600px;
+                margin: auto;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                background-color: rgb(240, 248, 255);
+            }}
 
-    send_confirmation(email_content, recipient)
-    # send_notification(email_content,recipient)
+            .input-wrapper {{
+                display: flex;
+                gap: 25px;
+            }}
+            h2 {{
+                color: black;
+                font-weight: bolder;
+            }}
+            .order-details, .shipping-info {{
+                margin-bottom: 20px;
+            }}
+            .order-details h3, .shipping-info h3 {{
+                margin-bottom: 5px;
+                color: #555;
+            }}
+            .order-details div, .shipping-info div {{
+                margin-bottom: 10px;
+            }}
+            .total {{
+                font-weight: bold;
+            }}
+            .footer {{
+                margin-top: 20px;
+                text-align: center;
+                font-size: 0.9em;
+                color: #777;
+            }}
 
-    return 'yaessss worked'
+            .email {{
+                text-decoration: underline;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+        <div class="input-wrapper">
+         <img src="https://dragonnier-site.netlify.app/images/DragonnierLogo.png" alt="Logo" width="60">
+            <h2>An order have been submitted by, {data['name']}!</h2>
+        </div>
+            <div class="order-details">
+                <h3>Order Details:</h3>
+                <div><strong>Product:</strong> {data['product']}</div>
+                <div><strong>Quantity:</strong> {data['quantity']}</div>
+                <div><strong>Subtotal:</strong> {data['subtotal']}</div>
+                <div><strong>Taxes:</strong> {data['taxes']}</div>
+                <div class="total"><strong>Total:</strong> {data['total']}</div>
+            </div>
+            <div class="shipping-info">
+                <h3>Shipping Information:</h3>
+                <div><strong>Name:</strong> {data['name']}</div>
+                <div><strong>Address:</strong> {data['address']}</div>
+                <div><strong>City:</strong> {data['city']}</div>
+                <div><strong>Postal Code:</strong> {data['postalCode']}</div>
+                <div><strong>Phone Number:</strong> {data['phone']}</div>
+                <div><strong>Company:</strong> {data['company']}</div>
+            </div>
+            <h3>Your order is now being processed. If you have any questions or need to make changes to your order, please feel free to contact us at <a class="email" href="mailto:help@dragonnier.com">help@dragonnier.com.</a> </h3>
+        </div>
+    </body>
+    </html>
+    """
+
+    if validate_email(recipient) == True:
+        print('Email is valid')
+        send_confirmation(email_content, recipient)
+        send_notification(email_content2,recipient)
+        return jsonify({"message": "Order was placed successfully"}), 200
+    else:
+        print('Email entered was not valid')
+        return jsonify({"Message": "Email entered was not valid"}), 400
+
+
+    
 
 
 if __name__ == "__main__":
