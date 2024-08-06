@@ -137,7 +137,7 @@ def send_confirmation(email_content, recipient):
 
 def send_notification(email_content, recipient):
     msg = Message(subject='Order Confirmation', sender='help@dragonnier.com',
-                  recipients=[f"{'yousifm2099@gmail.com'}"])
+                  recipients=[f"{'help@dragonnier.com'}"])
     msg.html = email_content
     mail.send(msg)
 
@@ -329,13 +329,13 @@ def place_order():
             <div class="shipping-info">
                 <h3>Shipping Information:</h3>
                 <div><strong>Name:</strong> {data['name']}</div>
+                <div><strong>Email:</strong> {recipient}</div>
                 <div><strong>Address:</strong> {data['address']}</div>
                 <div><strong>City:</strong> {data['city']}</div>
                 <div><strong>Postal Code:</strong> {data['postalCode']}</div>
                 <div><strong>Phone Number:</strong> {data['phone']}</div>
                 <div><strong>Company:</strong> {data['company']}</div>
             </div>
-            <h3>Your order is now being processed. If you have any questions or need to make changes to your order, please feel free to contact us at <a class="email" href="mailto:help@dragonnier.com">help@dragonnier.com.</a> </h3>
         </div>
     </body>
     </html>
