@@ -17,6 +17,8 @@ app.permanent_session_lifetime = timedelta(minutes=15)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
