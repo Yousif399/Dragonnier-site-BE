@@ -6,18 +6,23 @@ import os
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
-
+from datetime import timedelta
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials= True)
 basedir = os.path.abspath(os.path.dirname(__file__))
+
+app.permanent_session_lifetime = timedelta(minutes=15)
+
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     'SQLALCHEMY_DATABASE_URI')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
 app.config['MAIL_PORT'] = 587  # Use SSL
 app.config['MAIL_USERNAME'] = 'apikey'
 app.config['MAIL_PASSWORD'] = os.environ.get('SENDGRID_API_KEY')

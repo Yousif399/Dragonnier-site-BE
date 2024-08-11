@@ -1,4 +1,4 @@
-from flask import request, json, jsonify, render_template, send_file, send_from_directory
+from flask import request, json, jsonify, render_template, send_file, send_from_directory, redirect, url_for, session
 from config import app, db
 from models import Product
 from flask_mail import Mail, Message
@@ -70,10 +70,10 @@ def create_products():
         return jsonify({"error": str(e)}), 400
 
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    print('kkk', filename)
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+# @app.route('/uploads/<filename>')
+# def uploaded_file(filename):
+#     print('kkk', filename)
+#     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 # Update product
@@ -153,20 +153,18 @@ def validate_email(email):
         response = requests.get(url)
         data = response.json()
         if data and 'data' in data and 'status' in data['data']:
-            print('status of the email: ',data['data']['status'])
+            print('status of the email: ', data['data']['status'])
             if data['data']['status'] == 'invalid' or data['data']['status'] == 'disposable':
                 return False
         else:
             print('No data founded ')
             return False
-        
-        return True
-    
-    except Exception as e:
-        print('Error occurred ',e)
-        return False
 
-    
+        return True
+
+    except Exception as e:
+        print('Error occurred ', e)
+        return False
 
 
 @app.route('/place-order', methods=['POST'])
@@ -344,14 +342,93 @@ def place_order():
     if validate_email(recipient) == True:
         print('Email is valid')
         send_confirmation(email_content, recipient)
-        send_notification(email_content2,recipient)
+        send_notification(email_content2, recipient)
         return jsonify({"message": "Order was placed successfully"}), 200
     else:
         print('Email entered was not valid')
         return jsonify({"Message": "Email entered was not valid"}), 400
 
 
+# @app.route('/open', methods=["GET"])
+# def open_app():
+#     print('redirecting to dragonnier')
+#     return redirect('http://127.0.0.1:5500/access-product.html')
+
+username = os.environ.get('USERNAME')
+password = os.environ.get('PASSWORD')
+
+@app.route('/login', methods=["POST"])
+def log_in():
+    print('login is processing')
+    if request.method == "POST":
+        incoming_username = request.form['username']
+        incoming_password = request.form['password']
+
+        if incoming_username == username and incoming_password == password:
+            session.permanent = True
+            session['authenticated'] = True
+            return jsonify({'Message': f"Routing is working {username, password}"}), 200
+        else:
+            return jsonify({'Message': 'Invalid credentials'}), 401
+
+    return jsonify({"Message": "Should go back to log-in "}) 
+
     
+    
+    # return jsonify({"Message": f"The user: {username}  is not found, or {password} is wrong password make sure you entered a valid information "}), 401
+
+
+@app.route('/logout', methods=["GET"])
+def log_out():
+    # print(session.get('authenticated'))
+    if 'authenticated' in session:
+        session.pop('authenticated', False)
+        return jsonify({"Message": "User has been logged out"}), 200
+    else:
+        print('no session found')
+    return jsonify({"Message": "An error occur"}), 403
+
+
+@app.route('/handle-product', methods=['GET'])
+def handle_product_page():
+
+    if session.get('authenticated'):
+        print('its working')
+        print(session['authenticated'])
+        return jsonify({"Message": "worked"}), 200
+    else:
+        print("no user found")
+        return jsonify({"Message": "not worked"}), 401
+
+
+# @app.route("/login1", methods=["POST", "GET"])
+# def login():
+    if request.method == "POST":
+        username = request.form['username']
+        password = request.form['password']
+        session["user"] = username
+        session.permanent = True
+
+        print(f"User is {username},  session is {session}")
+        session.modified = True
+        return jsonify({"Message": "worked"}), 200
+    else:
+        if "user" in session:
+            return jsonify({"Message": "Session has been set and has a value now"}), 200 or 201
+
+    return jsonify({"Message": "No session available check server or try again"}), 401
+
+
+# @app.route("/user")
+# def user():
+#     print(f"session is {session}")
+#     if "user" in session:
+#         user = session["user"]
+#         print(user)
+#         return f"<h1>{user}</h1>"
+#     else:
+#         print('No user in session.....')
+#         return "No user in session found error", 401
 
 
 if __name__ == "__main__":
