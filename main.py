@@ -365,8 +365,9 @@ def log_in():
         incoming_password = request.form['password']
 
         if incoming_username == username and incoming_password == password:
-            session.permanent = True
             session['authenticated'] = True
+            session.permanent = True
+            print(f"Printing session: {session['authenticated']}")
             return jsonify({'Message': f"Routing is working {username, password}"}), 200
         else:
             return jsonify({'Message': 'Invalid credentials'}), 401
@@ -391,7 +392,7 @@ def log_out():
 
 @app.route('/handle-product', methods=['GET'])
 def handle_product_page():
-    print(f"The session: {session['authenticated']}")
+    # print(f"The session: {session['authenticated']}")
 
     if session.get('authenticated'):
         print('its working')
@@ -399,6 +400,7 @@ def handle_product_page():
         return jsonify({"Message": "worked"}), 200
     else:
         print("no user found")
+        print(session.get('authenticated'))
         return jsonify({"Message": "not worked"}), 401
 
 
