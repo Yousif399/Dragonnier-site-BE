@@ -10,19 +10,21 @@ from datetime import timedelta
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5500", "https://dragonnier-site-be.onrender.com"])
+CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5500",])
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app.permanent_session_lifetime = timedelta(minutes=15)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-app.config['SESSION_COOKIE_DOMAIN'] = '.onrender.com'
-app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # This is necessary for cross-site cookies
-app.config['SESSION_COOKIE_SECURE'] = True      # This ensures the cookie is only sent over HTTPS
-
-
-
+app.config['SESSION_COOKIE_NAME'] = 'Login'
+# app.config['SESSION_COOKIE_DOMAIN'] = '.onrender.com'
+# This is necessary for cross-site cookies
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+# This ensures the cookie is only sent over HTTPS
+app.config['SESSION_COOKIE_SECURE'] = True
+# Protects the cookie from JavaScript access
+app.config['SESSION_COOKIE_HTTPONLY'] = True
 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
