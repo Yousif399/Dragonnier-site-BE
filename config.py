@@ -15,7 +15,7 @@ CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5500",])
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
-session.permanent = True
+
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['SESSION_COOKIE_NAME'] = 'Login'
