@@ -380,7 +380,7 @@ def log_in():
 
 @app.route('/logout', methods=["GET"])
 def log_out():
-    # print(session.get('authenticated'))
+    print(session.get('authenticated'))
     if 'authenticated' in session:
         session.pop('authenticated', False)
         return jsonify({"Message": "User has been logged out"}), 200
@@ -391,6 +391,7 @@ def log_out():
 
 @app.route('/handle-product', methods=['GET'])
 def handle_product_page():
+    print(f"The session: {session['authenticated']}")
 
     if session.get('authenticated'):
         print('its working')
