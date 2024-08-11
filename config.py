@@ -10,12 +10,14 @@ from datetime import timedelta
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, supports_credentials= True)
+CORS(app, supports_credentials= True, origins='https://dragonnier-site-be.onrender.com')
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app.permanent_session_lifetime = timedelta(minutes=15)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SESSION_COOKIE_DOMAIN'] = '.onrender.com'
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 app.config['SESSION_COOKIE_SECURE'] = True
 
 
