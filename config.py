@@ -10,7 +10,7 @@ from datetime import timedelta
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["https://dragonnier-site.netlify.app",])
+CORS(app, supports_credentials=True)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
