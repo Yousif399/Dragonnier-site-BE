@@ -367,7 +367,7 @@ def log_in():
         if incoming_username == username and incoming_password == password:
             session['authenticated'] = True
             session.permanent = True
-            print(f"Printing session: {session['authenticated']}")
+            print(f"Logging in, Printing session: {session['authenticated']}")
             return jsonify({'Message': f"Routing is working {username, password}"}), 200
         else:
             return jsonify({'Message': 'Invalid credentials'}), 401
@@ -384,6 +384,7 @@ def log_out():
     print(session.get('authenticated'))
     if 'authenticated' in session:
         session.pop('authenticated', False)
+        print('Logging out...goodbye')
         return jsonify({"Message": "User has been logged out"}), 200
     else:
         print('no session found')
@@ -395,7 +396,7 @@ def handle_product_page():
     # print(f"The session: {session['authenticated']}")
 
     if session.get('authenticated'):
-        print('its working')
+        print('its working, navigating to product page')
         print(session['authenticated'])
         return jsonify({"Message": "worked"}), 200
     else:
