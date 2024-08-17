@@ -136,7 +136,7 @@ def send_confirmation(email_content, recipient):
 
 
 def send_notification(email_content, recipient):
-    msg = Message(subject='Order Confirmation', sender='help@dragonnier.com',
+    msg = Message(subject='Order Confirmation ', sender=('Dragonnier Orders','help@dragonnier.com'),
                   recipients=[f"{'help@dragonnier.com'}"])
     msg.html = email_content
     mail.send(msg)
