@@ -21,7 +21,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['SESSION_COOKIE_NAME'] = 'Login'
 # app.config['SESSION_COOKIE_DOMAIN'] = '.onrender.com'
 # This is necessary for cross-site cookies
-# app.config['SESSION_COOKIE_SAMESITE'] = 'None; Secure'
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 # This ensures the cookie is only sent over HTTPS
 app.config['SESSION_COOKIE_SECURE'] = True
 # Protects the cookie from JavaScript access
